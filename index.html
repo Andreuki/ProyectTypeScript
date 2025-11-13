@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InmoSanvi</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="src/index.ts" type="module"></script>
+  <script src="./src/index.ts" type="module"></script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
 
@@ -20,17 +20,17 @@
         <a class="text-gray-600 hover:text-gray-900 hidden" href="new-property.html" id="new-property-link">New Property</a>
         <a class="text-gray-600 hover:text-gray-900" href="login.html" title="login" id="login-link">
           <svg class="icon" width="24" height="24">
-            <use href="icons/login.svg#login"></use>
+            <use href="./icons/login.svg"></use>
           </svg>
         </a>
         <a class="text-gray-600 hover:text-gray-900 hidden" href="profile.html" title="profile" id="profile-link">
           <svg class="icon" width="24" height="24">
-            <use href="icons/profile.svg#profile"></use>
+            <use href="./icons/profile.svg"></use>
           </svg>
         </a>
         <button class="text-gray-600 hover:text-gray-900 hidden cursor-pointer" href="profile.html" title="logout" id="logout-link">
           <svg class="icon" width="24" height="24">
-            <use href="icons/logout.svg#logout"></use>
+            <use href="./icons/logout.svg"></use>
           </svg>
         </button>
       </nav>
@@ -88,7 +88,7 @@
     <div class="bg-white rounded-lg shadow-md flex flex-col relative overflow-visible">
       <button class="absolute -right-3 -top-3 rounded-full text-white bg-red-700 p-1 shadow-md hover:bg-red-600 btn-delete">
         <svg class="icon" width="24" height="24">
-          <use href="icons/close.svg#close"></use>
+          <use href="./icons/close.svg"></use>
         </svg>
       </button>
       <a href=""><img src="" alt="Photo of the property" class="w-full aspect-[16/10] object-cover property-image"></a>

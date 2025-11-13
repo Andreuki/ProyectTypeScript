@@ -3,17 +3,18 @@ import { MapService } from "./classes/map.service";
 import { MyGeolocation } from "./classes/my-geolocation";
 import { PropertiesService } from "./classes/properties.service";
 import { ProvincesService } from "./classes/provinces.service";
+import type { Feature } from "ol";
 
-const propertyForm = document.getElementById("property-form");
-const mainPhotoInput = document.getElementById("mainPhoto");
-const imagePreview = document.getElementById("image-preview");
-const provincesSelect = document.getElementById("province");
-const townsSelect = document.getElementById("town");
+const propertyForm = document.getElementById("property-form") as HTMLFormElement;
+const mainPhotoInput = document.getElementById("mainPhoto") as HTMLInputElement;
+const imagePreview = document.getElementById("image-preview") as HTMLImageElement;
+const provincesSelect = document.getElementById("province") as HTMLInputElement;
+const townsSelect = document.getElementById("town") as HTMLInputElement;
 
 const propertiesService = new PropertiesService();
 const provincesService = new ProvincesService();
-let mapService = null;
-let marker = null;
+let mapService : MapService;
+let marker : Feature;
 
 let towns = [];
 
@@ -34,7 +35,7 @@ mainPhotoInput.addEventListener("change", () => {
       reader.readAsDataURL(file);
 
       reader.addEventListener('load', () => {
-        imagePreview.src = reader.result;
+        imagePreview.src = reader.result as string;
         imagePreview.classList.remove("hidden");
       });
     }
@@ -52,12 +53,12 @@ propertyForm.addEventListener("submit", async (event) => {
   const propertyData = {
     title: formData.get("title"),
     description: formData.get("description"),
-    townId: +formData.get("town"),
+    townId: formData.get("town"),
     address: formData.get("address"),
-    price: +formData.get("price"),
-    sqmeters: +formData.get("sqmeters"),
-    numRooms: +formData.get("numRooms"),
-    numBaths: +formData.get("numBaths"),
+    price: formData.get("price"),
+    sqmeters: formData.get("sqmeters"),
+    numRooms: formData.get("numRooms"),
+    numBaths: formData.get("numBaths"),
     mainPhoto: imagePreview.src,
   };
 
@@ -67,7 +68,7 @@ propertyForm.addEventListener("submit", async (event) => {
 
 provincesSelect.addEventListener("change", () => loadTowns(+provincesSelect.value));
 townsSelect.addEventListener("change", () => {
-  const {latitude, longitude} = towns?.find(t => t.id === +townsSelect.value) ?? {};
+  const {latitude, longitude} = towns?.find(t => t.id === townsSelect.value) ?? {};
   mapService.view.setCenter([longitude ?? 0, latitude ?? 0]);
   marker.setGeometry(new Point([longitude ?? 0, latitude ?? 0]));
 });
@@ -95,6 +96,7 @@ async function loadTowns(idProvince) {
 }
 
 async function loadMap() {
+
   const coords = await MyGeolocation.getLocation();
   mapService = new MapService(coords, "map");
   marker = mapService.createMarker(coords);

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InmoSanvi</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="src/new-property.ts" type="module"></script>
+  <script src="./src/new-property.ts" type="module"></script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
 
@@ -20,12 +20,12 @@
         <a class="font-semibold text-gray-600 hover:text-gray-900" href="new-property.html">New Property</a>
         <a class="text-gray-600 hover:text-gray-900" href="profile.html" title="login">
           <svg class="icon" width="24" height="24">
-            <use href="icons/profile.svg#profile"></use>
+            <use href="./icons/profile.svg"></use>
           </svg>
         </a>
         <button class="text-gray-600 hover:text-gray-900 cursor-pointer" href="profile.html" title="logout" id="logout-link">
           <svg class="icon" width="24" height="24">
-            <use href="icons/logout.svg#logout"></use>
+            <use href="./icons/logout.svg"></use>
           </svg>
         </button>
       </nav>
@@ -59,7 +59,7 @@
           <button type="button" id="generate-button" class="text-slate-500 border border-slate-500 shadow-md font-bold py-1 px-2 rounded-lg hover:text-slate-600 ms-2 mb-2 cursor-pointer">
             Generate
             <svg class="inline" width="24" height="24">
-              <use href="icons/build.svg#build"></use>
+              <use href="./icons/build.svg"></use>
             </svg>
           </button>
           <input type="text" id="title" name="title" required minlength="5" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
