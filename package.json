@@ -7,7 +7,10 @@
     "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "eslint src",
+    "prestart": "npm run format && npm run test",
+    "format": "prettier --write --cache --parser typescript \"src/**/*.ts\""
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
