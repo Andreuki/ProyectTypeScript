@@ -12,13 +12,29 @@ import type {
 export class PropertiesService {
   #http = new Http();
 
-  async getProperties(): Promise<Property[]> {
+  /*   async getProperties(): Promise<Property[]> {
     const resp = await this.#http.get<PropertiesResponse>(
       `${SERVER}/properties`
     );
     return resp.properties;
-  }
+  } */
 
+  async getPropertiesWithFilters(
+    page: number = 1,
+    provinceId: number = 0,
+    search: string = ""
+  ): Promise<PropertiesResponse> {
+    const params = new URLSearchParams({
+      page: String(page),
+      ...(provinceId !== 0 && { province: String(provinceId) }),
+      ...(search !== "" && { search }),
+    });
+
+    const resp = await this.#http.get<PropertiesResponse>(
+      `${SERVER}/properties?${params.toString()}`
+    );
+    return resp;
+  }
   async getPropertyById(id: number): Promise<Property> {
     const resp = await this.#http.get<SinglePropertyResponse>(
       `${SERVER}/properties/${id}`

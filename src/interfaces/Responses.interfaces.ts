@@ -7,6 +7,7 @@ export interface TokenResponse {
 
 export interface PropertiesResponse {
   properties: Property[];
+  more: boolean;
 }
 
 export interface SinglePropertyResponse {

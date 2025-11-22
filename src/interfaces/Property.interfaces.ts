@@ -8,7 +8,7 @@ export interface Town {
   name: string;
   longitude: number;
   latitude: number;
-  province: Province;
+  province: number;
 }
 
 export interface Property extends PropertyInsert {
