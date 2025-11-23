@@ -43,7 +43,7 @@ async function formValidation(e: Event): Promise<void> {
     await authService.login(user);
     location.assign("index.html");
   } catch (e) {
-    alert("login erro!");
+    alert("login error!");
     throw e;
   }
 }
