@@ -1,15 +1,46 @@
 import { PropertiesService } from "./classes/properties.service";
 import type { Property } from "./interfaces/Property.interfaces";
 import { MapService } from "./classes/map.service";
-/* import { UserService } from "./classes/userService"; */
+import { AuthService } from "./classes/authService";
 
 const properties = new PropertiesService();
-/* const users = new UserService(); */
+const authService = new AuthService();
+
 try {
-  
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
+
+  if(!id){
+    location.assign("index.html");
+  }
+  
   const property: Property = await properties.getPropertyById(Number(id));
+  await authService.checkToken();
+
+  const logoutButton = document.getElementById(
+    "logout-link"
+  ) as HTMLButtonElement;
+  logoutButton.classList.remove("hidden");
+
+  const showProfile = document.getElementById(
+    "profile-link"
+  ) as HTMLAnchorElement;
+  showProfile.classList.remove("hidden");
+
+  const showNewProperty = document.getElementById(
+    "new-property-link"
+  ) as HTMLAnchorElement;
+  showNewProperty.classList.remove("hidden");
+
+  const removeLogin = document.getElementById(
+    "login-link"
+  ) as HTMLAnchorElement;
+  removeLogin.classList.add("hidden");
+
+  logoutButton.addEventListener("click", () => {
+    authService.logout();
+    location.assign("index.html");
+  });
 
   const title = document.getElementById("property-title") as HTMLTitleElement;
   title.textContent = property.title;
@@ -44,17 +75,21 @@ try {
 
   const baths = document.getElementById("property-baths") as HTMLSpanElement;
   baths.textContent = String(property.numBaths);
- 
-  const sellerName = document.getElementById("seller-name") as HTMLParagraphElement;
+
+  const sellerName = document.getElementById(
+    "seller-name"
+  ) as HTMLParagraphElement;
   sellerName.textContent = property.seller.name;
-  
-  const sellerEmail= document.getElementById("seller-email") as HTMLParagraphElement;
+
+  const sellerEmail = document.getElementById(
+    "seller-email"
+  ) as HTMLParagraphElement;
   sellerEmail.textContent = property.seller.email;
 
-  const profilePicture = document.getElementById("seller-photo") as HTMLSourceElement;
-  profilePicture.src = property.seller.avatar;  
-  
-  
+  const profilePicture = document.getElementById(
+    "seller-photo"
+  ) as HTMLSourceElement;
+  profilePicture.src = property.seller.avatar;
 
   createMap(property);
 

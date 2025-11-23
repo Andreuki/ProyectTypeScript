@@ -5,7 +5,6 @@ export interface User extends Omit<RegisterData, "password"> {
   me?: boolean;
   lat?: number;
   lng?: number;
-
 }
 
 export interface UserLogin {
