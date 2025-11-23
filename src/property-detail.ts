@@ -10,11 +10,13 @@ try {
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
 
-  if(!id){
+  if (!id) {
     location.assign("index.html");
   }
-  
+
   const property: Property = await properties.getPropertyById(Number(id));
+  createMap(property);
+
   await authService.checkToken();
 
   const logoutButton = document.getElementById(
@@ -90,8 +92,6 @@ try {
     "seller-photo"
   ) as HTMLSourceElement;
   profilePicture.src = property.seller.avatar;
-
-  createMap(property);
 
   const mortgageCalculatorForm = document.getElementById(
     "mortgage-calculator"

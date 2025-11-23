@@ -10,6 +10,7 @@ import type {
   Province,
 } from "./interfaces/Property.interfaces";
 import { AuthService } from "./classes/authService";
+import type { User } from "./interfaces/User.interfaces";
 
 const authService = new AuthService();
 
@@ -95,6 +96,7 @@ async function authenticatedUser(): Promise<void> {
         numBaths: Number(formData.get("numBaths")),
         mainPhoto: imagePreview.src,
         town: {} as Town,
+        seller: {} as User,
       };
 
       await propertiesService.insertProperty(propertyData);
