@@ -1,3 +1,5 @@
+import type { User } from "./User.interfaces";
+
 export interface Province {
   id: number;
   name: string;
@@ -24,6 +26,7 @@ export interface Property extends PropertyInsert {
   createdAt?: string;
   status?: string;
   town: Town;
+  seller: User;
 }
 
 export interface PropertyInsert {
@@ -39,4 +42,5 @@ export interface PropertyInsert {
   createdAt?: string;
   status?: string;
   town: Town;
+  seller: User;
 }
