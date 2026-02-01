@@ -1,10 +1,11 @@
 import { SERVER } from "../constants";
 import { Http } from "./http.class.ts";
-import type { Province, Town } from "../interfaces/Property.interfaces.ts";
 import type {
   ProvincesResponse,
   TownsResponse,
 } from "../interfaces/Responses.interfaces.ts";
+import type { Province } from "../interfaces/Province.interface.ts";
+import type { Town } from "../interfaces/Town.interface.ts";
 
 export class ProvincesService {
   #http = new Http();

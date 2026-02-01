@@ -7,11 +7,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        newproperty: 'new_property.html',
-        propertyDetail: 'property-detail',
-        register:'register',
-        login: 'login',
-        profile:'profile'
+        newproperty: 'new-property.html',
+        propertyDetail: 'property-detail.html',
+        register:'register.html',
+        login: 'login.html',
+        profile:'profile.html'
       }
     }
   }

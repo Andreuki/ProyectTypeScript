@@ -2,6 +2,7 @@ import { PropertiesService } from "./classes/properties.service";
 import type { Property } from "./interfaces/Property.interfaces";
 import { MapService } from "./classes/map.service";
 import { AuthService } from "./classes/authService";
+import type { Rating } from "./interfaces/User.interfaces";
 
 const properties = new PropertiesService();
 const authService = new AuthService();
@@ -52,7 +53,7 @@ try {
   const fullAdress = document.getElementById(
     "property-address"
   ) as HTMLParagraphElement;
-  fullAdress.textContent = `${property.address}, ${townId}`;
+  fullAdress.textContent = `${property.address},${property.town.province.name}, ${townId}`;
 
   const description = document.getElementById(
     "property-description"
@@ -164,6 +165,107 @@ try {
   }
 
   mortgageCalculatorForm.addEventListener("submit", formValidate);
+
+   const totalRatingSpan = document.getElementById(
+    "total-rating"
+  ) as HTMLSpanElement;
+  const totalStarsSpan = document.getElementById(
+    "total-stars"
+  ) as HTMLSpanElement;
+  const ratingsContainer = document.getElementById(
+    "ratings-container"
+  ) as HTMLDivElement;
+  const ratingFormContainer = document.getElementById(
+    "rating-form-container"
+  ) as HTMLDivElement;
+  const ratingForm = document.getElementById("rating-form") as HTMLFormElement;
+
+  function getStars(rating: number): string {
+    const filledStars = "★".repeat(Math.round(rating));
+    const emptyStars = "☆".repeat(5 - Math.round(rating));
+    return filledStars + emptyStars;
+  }
+
+  function updateTotalRating(rating: number) {
+    if (totalRatingSpan) totalRatingSpan.textContent = rating.toFixed(1);
+    if (totalStarsSpan) totalStarsSpan.textContent = getStars(rating);
+  }
+
+  function renderRating(
+    rating: Rating,
+    container: HTMLElement,
+    prepend: boolean = true
+  ) {
+    const template = document.getElementById(
+      "rating-template"
+    ) as HTMLTemplateElement;
+    const clone = template.content.cloneNode(true) as DocumentFragment;
+
+    const photo = clone.querySelector(".rating-photo") as HTMLImageElement;
+    photo.src = rating.user?.avatar || "";
+    const photoLink = photo.parentElement as HTMLAnchorElement;
+    if (photoLink) photoLink.href = `profile.html?id=${rating.user?.id}`;
+
+    const author = clone.querySelector(".rating-author") as HTMLAnchorElement;
+    author.textContent = rating.user?.name || "Anonymous";
+    author.href = `profile.html?id=${rating.user?.id}`;
+
+    const stars = clone.querySelector(".rating-stars") as HTMLSpanElement;
+    stars.textContent = getStars(rating.rating);
+
+    const comment = clone.querySelector(
+      ".rating-comment"
+    ) as HTMLParagraphElement;
+    comment.textContent = rating.comment;
+
+    if (prepend) {
+      container.prepend(clone);
+    } else {
+      container.append(clone);
+    }
+  }
+
+  if (property.rating !== undefined) {
+    updateTotalRating(property.rating);
+  }
+
+  const existingRatings = await properties.getRating(Number(id));
+
+  existingRatings.forEach((r: Rating) =>
+    renderRating(r, ratingsContainer, true)
+  );
+
+  try {
+    await authService.checkToken();
+    ratingFormContainer.classList.remove("hidden");
+  } catch (e) {
+    console.log(e);
+  }
+
+  ratingForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const formData = new FormData(ratingForm);
+    const ratingValue = Number(formData.get("rating"));
+    const commentValue = formData.get("comment") as string;
+
+    try {
+      const resp = await properties.addRating(Number(id), {
+        rating: ratingValue,
+        comment: commentValue,
+      });
+
+      renderRating(resp, ratingsContainer, true);
+
+      if (resp.newRating !== undefined) {
+        updateTotalRating(resp.newRating);
+      }
+      
+      ratingForm.reset();
+    } catch (error) {
+      console.error("Error adding rating:", error);
+      alert("Failed to post your rating. Please try again.");
+    }
+  });
 } catch (e) {
   console.log(e);
   location.assign("index.html");

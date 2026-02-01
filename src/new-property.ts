@@ -4,13 +4,11 @@ import { MyGeolocation } from "./classes/my-geolocation";
 import { PropertiesService } from "./classes/properties.service";
 import { ProvincesService } from "./classes/provinces.service";
 import type { Feature } from "ol";
-import type {
-  Town,
-  PropertyInsert,
-  Province,
-} from "./interfaces/Property.interfaces";
+import type { PropertyInsert } from "./interfaces/Property.interfaces";
 import { AuthService } from "./classes/authService";
 import type { User } from "./interfaces/User.interfaces";
+import type { Town } from "./interfaces/Town.interface";
+import type { Province } from "./interfaces/Province.interface";
 
 const authService = new AuthService();
 
@@ -164,3 +162,108 @@ async function authenticatedUser(): Promise<void> {
 }
 
 void authenticatedUser();
+
+/* eslint-disable */
+declare const LanguageDetector: any;
+declare const Translator: any;
+declare const Summarizer: any;
+
+async function detectLanguage(text: string): Promise<string> {
+  const detector = await LanguageDetector.create({
+    expectedInputLanguages: ["en", "es", "de", "fr"],
+  });
+  const results = await detector?.detect(text);
+  return results[0]?.detectedLanguage ?? "en";
+}
+
+async function translate(
+  text: string,
+  sourceLang: string,
+  targetLang: string
+): Promise<string> {
+  const translator = await Translator.create({
+    sourceLanguage: sourceLang,
+    targetLanguage: targetLang,
+  });
+  return await translator.translate(text);
+}
+
+async function summarize(text: string): Promise<string> {
+  const summarizer = await Summarizer.create({
+    sharedContext:
+      "A catchy title for selling a real estate property in the market fast",
+    type: "headline",
+    length: "short",
+    format: "plain-text",
+    expectedInputLanguages: ["en", "es"],
+    outputLanguage: "en",
+  });
+  return await summarizer.summarize(text);
+}
+/* eslint-enable */
+
+const translateBtn = document.getElementById(
+  "translate-button"
+) as HTMLButtonElement;
+const generateBtn = document.getElementById(
+  "generate-button"
+) as HTMLButtonElement;
+const description = document.getElementById(
+  "description"
+) as HTMLTextAreaElement;
+const propertyForm = document.getElementById(
+  "property-form"
+) as HTMLFormElement;
+const titleInput = propertyForm.elements.namedItem("title") as HTMLInputElement;
+
+translateBtn.addEventListener("click", async () => {
+  translateBtn.disabled = true;
+  try {
+    const text = description.value;
+
+    if (!text.trim()) {
+      alert("Please enter some text to translate");
+      return;
+    }
+
+    const detectedLang = await detectLanguage(text);
+
+    if (detectedLang === "en") {
+      alert("The text is already in English");
+      return;
+    }
+
+    description.value = await translate(text, detectedLang, "en");
+  } catch (error) {
+    alert(
+      "Translation error: " +
+        (error instanceof Error ? error.message : String(error))
+    );
+  } finally {
+    translateBtn.disabled = false;
+  }
+});
+
+generateBtn.addEventListener("click", async () => {
+  generateBtn.disabled = true;
+  try {
+    const text = description.value;
+
+    if (text.length < 20) {
+      alert(
+        "Description must be at least 20 characters long to generate a title"
+      );
+      return;
+    }
+
+    const generatedTitle = await summarize(text);
+    titleInput.value = generatedTitle;
+  } catch (error) {
+    alert(
+      "Title generation error: " +
+        (error instanceof Error ? error.message : String(error))
+    );
+  } finally {
+    generateBtn.disabled = false;
+  }
+});

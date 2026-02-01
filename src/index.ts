@@ -1,11 +1,21 @@
 import { PropertiesService } from "./classes/properties.service";
-import type { Property, Province } from "./interfaces/Property.interfaces";
+import type { Property } from "./interfaces/Property.interfaces";
 import { ProvincesService } from "./classes/provinces.service";
 import type { PropertiesResponse } from "./interfaces/Responses.interfaces";
 import { AuthService } from "./classes/authService";
+import type { Province } from "./interfaces/Province.interface";
 
 const provincesService = new ProvincesService();
 const authService = new AuthService();
+
+const propertiesService = new PropertiesService();
+
+let currentPage = 1;
+let hasMoreProperties = false;
+let currentProvinceId = 0;
+let currentSearch = "";
+let currentSellerId = 0;
+let sellerName = "";
 
 async function authenticatedUser(): Promise<void> {
   try {
@@ -49,12 +59,6 @@ const cardTemplate = document.getElementById(
   "property-card-template"
 ) as HTMLTemplateElement;
 
-const propertiesService = new PropertiesService();
-let currentPage = 1;
-let hasMoreProperties = false;
-let currentProvinceId = 0;
-let currentSearch = "";
-
 function createAndAppendCard(propertyData: Property): void {
   const cardClone = (cardTemplate.content.cloneNode(true) as DocumentFragment)
     .firstElementChild as HTMLElement;
@@ -71,7 +75,7 @@ function createAndAppendCard(propertyData: Property): void {
   titleLink.href = `property-detail.html?id= ${propertyData.id}`;
   titleLink.append(propertyData.title);
   (cardClone.querySelector(".property-location") as HTMLElement).append(
-    `${propertyData.address}, ${propertyData.town.name}`
+    `${propertyData.address},${propertyData.town.province.name},${propertyData.town.name}`
   );
   (cardClone.querySelector(".property-price") as HTMLElement).append(
     formattedPrice
@@ -90,12 +94,25 @@ function createAndAppendCard(propertyData: Property): void {
   imageLink.href = `property-detail.html?id= ${propertyData.id}`;
   image.src = propertyData.mainPhoto;
 
+  if (!propertyData.mine) {
+    (cardClone.querySelector(".btn-delete") as HTMLElement).classList.add(
+      "hidden"
+    );
+  }
   (cardClone.querySelector(".btn-delete") as HTMLElement).addEventListener(
     "click",
     async () => {
       if (propertyData.id !== undefined) {
-        await propertiesService.deleteProperty(propertyData.id);
-        cardClone.remove();
+        if (propertyData.mine) {
+          //propertyData.seller?¿
+          const deleteProperty = confirm(
+            "Are you sure you want to delete the property?"
+          );
+          if (deleteProperty) {
+            await propertiesService.deleteProperty(propertyData.id);
+            cardClone.remove();
+          }
+        }
       }
     }
   );
@@ -104,11 +121,25 @@ function createAndAppendCard(propertyData: Property): void {
 }
 
 async function getProperties(): Promise<void> {
+  const params = new URLSearchParams(location.search);
+  currentSellerId = Number(params.get("seller")) || 0;
+
+  if (currentSellerId) {
+    try {
+      const seller = await new (
+        await import("./classes/userService")
+      ).UserService().getProfile(currentSellerId);
+      sellerName = seller.name;
+    } catch (e) {
+      console.error("Error fetching seller", e);
+    }
+  }
   const response: PropertiesResponse =
     await propertiesService.getPropertiesWithFilters(
       currentPage,
       currentProvinceId,
-      currentSearch
+      currentSearch,
+      currentSellerId
     );
 
   hasMoreProperties = Boolean(response.more);
@@ -159,22 +190,14 @@ async function applyFilters() {
     await propertiesService.getPropertiesWithFilters(
       currentPage,
       currentProvinceId,
-      currentSearch
+      currentSearch,
+      currentSellerId
     );
 
   hasMoreProperties = Boolean(response.more);
   response.properties.forEach(p => createAndAppendCard(p));
 
-  const filterInfo = document.getElementById("filter-Info") as HTMLDivElement;
-
-  if (provinceName === "All provinces" && currentSearch === "") {
-    filterInfo.textContent = "No filters applied";
-  } else if (provinceName !== "All provinces" && currentSearch === "") {
-    filterInfo.textContent = `Province: ${provinceName}.`;
-  } else {
-    filterInfo.textContent = `Province: ${provinceName}. Search: ${currentSearch}`;
-  }
-
+  updateFilterInfo(provinceName);
   updateLoadMoreButton();
 }
 
@@ -197,6 +220,18 @@ morePropertiesBtn.addEventListener("click", async (): Promise<void> => {
   await loadMoreProperties();
   updateLoadMoreButton();
 });
+
+function updateFilterInfo(provinceName: string) {
+  const filterInfo = document.getElementById("filter-Info") as HTMLDivElement;
+
+  if (provinceName === "All provinces" && currentSearch === "") {
+    filterInfo.textContent = "No filters applied";
+  } else if (provinceName !== "All provinces" && currentSearch === "") {
+    filterInfo.textContent = `Province: ${provinceName}.`;
+  } else {
+    filterInfo.textContent = `Province: ${provinceName}, Search: ${currentSearch}, Seller: ${sellerName}`;
+  }
+}
 
 async function loadMoreProperties(): Promise<void> {
   const response: PropertiesResponse =
