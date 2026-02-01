@@ -47,7 +47,7 @@ export class PropertiesService {
     return resp.property;
   }
 
-  async insertProperty(property: Property): Promise<Property> {
+  async insertProperty(property: PropertyInsert): Promise<Property> {
     const resp = await this.#http.post<SinglePropertyResponse, PropertyInsert>(
       `${SERVER}/properties`,
       property

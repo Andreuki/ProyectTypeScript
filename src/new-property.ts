@@ -176,6 +176,8 @@ async function detectLanguage(text: string): Promise<string> {
   return results[0]?.detectedLanguage ?? "en";
 }
 
+//NOTA: Si usas Brave no funciona la función para traducir, con Chrome sí funciona
+
 async function translate(
   text: string,
   sourceLang: string,

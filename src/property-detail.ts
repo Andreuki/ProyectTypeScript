@@ -166,7 +166,7 @@ try {
 
   mortgageCalculatorForm.addEventListener("submit", formValidate);
 
-   const totalRatingSpan = document.getElementById(
+  const totalRatingSpan = document.getElementById(
     "total-rating"
   ) as HTMLSpanElement;
   const totalStarsSpan = document.getElementById(
@@ -259,7 +259,7 @@ try {
       if (resp.newRating !== undefined) {
         updateTotalRating(resp.newRating);
       }
-      
+
       ratingForm.reset();
     } catch (error) {
       console.error("Error adding rating:", error);
